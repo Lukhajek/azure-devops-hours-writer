@@ -102,9 +102,11 @@ const formatReport = (report) => {
       .catch(() => {});
 
     const completedWork =
-      WIResponse?.data?.fields?.["Microsoft.VSTS.Scheduling.CompletedWork"];
+      WIResponse?.data?.fields?.["Microsoft.VSTS.Scheduling.CompletedWork"] ??
+      0;
+    const name = WIResponse?.data?.fields?.["System.Title"];
 
-    if (!WIResponse || !completedWork) {
+    if (!WIResponse || !name) {
       spinner.error({ text: `Error reading work item ${item.WI}` });
       continue;
     }
@@ -112,7 +114,7 @@ const formatReport = (report) => {
     const newHours = Math.floor(completedWork * 100 + item.hours * 100) / 100;
     spinner.success({
       text: `Work item ${chalk.yellow(
-        `#${item.WI}`
+        `#${item.WI} (${name})`
       )} read. Current completed hours: ${chalk.yellow(
         completedWork
       )}. Hours from report ${chalk.blue(
@@ -124,6 +126,7 @@ const formatReport = (report) => {
       completedWork,
       hours: item.hours,
       newHours,
+      name,
     });
   }
 
@@ -132,12 +135,12 @@ const formatReport = (report) => {
   for (let item of WIs) {
     const spinner = createSpinner(
       `Patching work item ${chalk.yellow(
-        `#${item.id}`
+        `#${item.id} (${item.name})`
       )}. New hours: ${chalk.green(item.newHours)}.`
     ).start();
     const patchResponse = await axios
       .patch(
-        `https://dev.azure.com/${organization}/_apis/wit/workitems/1124?api-version=6.1`,
+        `https://dev.azure.com/${organization}/_apis/wit/workitems/${item.id}?api-version=6.1`,
         [
           {
             op: "add",
@@ -155,7 +158,7 @@ const formatReport = (report) => {
       .catch(() => {});
 
     const newHours =
-      patchResponse.data.fields["Microsoft.VSTS.Scheduling.CompletedWork"];
+      patchResponse?.data?.fields?.["Microsoft.VSTS.Scheduling.CompletedWork"];
 
     if (!patchResponse || !newHours) {
       spinner.error({
@@ -169,7 +172,7 @@ const formatReport = (report) => {
     spinner.success({
       text: chalk.green(
         `Work item ${chalk.yellow(
-          `#${item.id}`
+          `#${item.id} (${item.name})`
         )} patched. New hours: ${chalk.green(newHours)}.`
       ),
     });
