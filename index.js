@@ -35,7 +35,7 @@ const formatReport = (report) => {
     type: "input",
     message: "Enter the path to the file with the report",
     default() {
-      const files = fs.readdirSync("./");
+      const files = fs.readdirSync(process.cwd());
       const csvFiles = files.filter((file) => file.endsWith(".csv"));
       if (csvFiles.length === 1) {
         return csvFiles[0];

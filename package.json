@@ -1,6 +1,6 @@
 {
-  "name": "azure-writer",
-  "version": "1.0.0",
+  "name": "azure-devops-hours-writer",
+  "version": "1.0.1",
   "description": "",
   "main": "index.js",
   "scripts": {
