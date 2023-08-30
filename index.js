@@ -29,6 +29,8 @@ const formatReport = (report) => {
   }));
 };
 
+const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
 (async () => {
   const { fileName } = await inquirer.prompt({
     name: "fileName",
@@ -128,6 +130,8 @@ const formatReport = (report) => {
       newHours,
       name,
     });
+
+    await wait(1000);
   }
 
   await confirmContinue();
@@ -176,5 +180,7 @@ const formatReport = (report) => {
         )} patched. New hours: ${chalk.green(newHours)}.`
       ),
     });
+
+    await wait(1000)
   }
 })();
